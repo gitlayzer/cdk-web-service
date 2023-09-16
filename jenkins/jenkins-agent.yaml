@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-agent
+  namespace: kube-ops
+  labels:
+    app: jenkins-agent
+spec:
+  selector:
+    matchLabels:
+      app: jenkins-agent
+  template:
+    metadata:
+      labels:
+        app: jenkins-agent
+    spec:
+      containers:
+      - name: agent
+        image: dockerproxy.com/jenkins/inbound-agent:latest
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+        env:
+        - name: JENKINS_URL
+          value: http://jenkins.kube-ops.svc.cluster.local:8080
+        - name: JENKINS_SECRET
+          value: 74061e5093ff86fbef064aae276bb50beb1b7fd40141ef47e09cb5e4eb8cfd7d
+        - name: JENKINS_AGENT_NAME
+          value: static_agent
+        - name: JENKINS_AGENT_WORKDIR
+          value: /home/jenkins/workspace

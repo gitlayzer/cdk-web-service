@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jenkins-pv
+  labels:
+    app: jenkins
+spec:
+  accessModes: ["ReadWriteOnce"]
+  capacity:
+    storage: 5Gi
+  storageClassName: local-storage
+  local:
+    path: /data/jenkins
+  persistentVolumeReclaimPolicy: Retain
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - k-m-1

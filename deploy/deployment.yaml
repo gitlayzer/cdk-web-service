@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cdk-web
+  labels:
+    app: cdk-web
+spec:
+  selector:
+    matchLabels:
+      app: cdk-web
+  template:
+    metadata:
+      labels:
+        app: cdk-web
+    spec:
+      containers:
+      - name: cdk-web
+        image: "layzer/cdk-web-server:v0.0.1"
+        env:
+        - name: GIN_MODE
+          value: release
+        ports:
+        - name: http
+          protocol: TCP
+          containerPort: 8080
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 600
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi

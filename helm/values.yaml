@@ -1,0 +1,47 @@
+replicaCount: 2
+
+namespace: ""
+
+labels:
+  app: cdk-web-service
+
+env:
+- name: GIN_MODE
+  value: release
+
+image:
+  repository: layzer/cdk-web-service # {"$imagepolicy": "default:k8s-demo:name"}
+  pullPolicy: IfNotPresent
+  tag: 3174d35 # {"$imagepolicy": "default:k8s-demo:tag"}
+
+imagePullSecrets: []
+nameOverride: "cdk-web-service"
+fullnameOverride: "cdk-web-service"
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+  - host: cdk-web.devops-engineer.com.cn
+    paths:
+    - path: /
+      pathType: Prefix
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
