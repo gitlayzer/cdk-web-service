@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins
+  namespace: kube-ops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      serviceAccount: jenkins
+      initContainers:
+      - name: fix-permissions
+        image: dockerproxy.com/library/busybox:latest
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c", "chown -R 1000:1000 /var/jenkins_home"]
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: jenkinshome
+          mountPath: /var/jenkins_home
+      containers:
+      - name: jenkins
+        image: dockerproxy.com/jenkins/jenkins:lts-jdk11
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: JAVA_OPTS
+          value: -Dhudson.model.DownloadService.noSignatureCheck=true -Dhudson.security.csrf.GlobalCrumbIssuerConfiguration.DISABLE_CSRF_PROTECTION=true
+        ports:
+        - name: web
+          protocol: TCP
+          containerPort: 8080
+        - name: agent
+          protocol: TCP
+          containerPort: 50000
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 1Gi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+        volumeMounts:
+        - name: jenkinshome
+          mountPath: /var/jenkins_home
+      volumes:
+      - name: jenkinshome
+        persistentVolumeClaim:
+          claimName: jenkins-pvc

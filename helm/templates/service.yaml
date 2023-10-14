@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "cdk-web.fullname" . }}
+  labels:
+    {{- include "cdk-web.selectorLabels" . | nindent 4 }}
+  namespace: {{ default .Values.namespace "default" }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - port: {{ .Values.service.port }}
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    {{- include "cdk-web.selectorLabels" . | nindent 4 }}

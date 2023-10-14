@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cdk-web
+  labels:
+    app: cdk-web
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: cdk-web.devops-engineer.com.cn
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: cdk-web
+            port:
+              name: http
